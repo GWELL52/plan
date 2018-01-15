@@ -9,3 +9,4 @@ Java 8 In Action/out/
 
 # Repository wide ignore mac DS_Store files
 .DS_Store
+Java 8 In Action/.idea/workspace.xml
