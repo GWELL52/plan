@@ -25,7 +25,7 @@
 
 
 
-### 小结
+#### 小结
 
 > 一下是从本章学到的关键概念：
 >
@@ -242,7 +242,7 @@ List<String> evenNumbers = filter(numbers, (Integer i) -> i%2 == 0 );
 
 看这样你就可以用在任意的类型上了，只要改变条件和引用类型！
 
-### 小结
+#### 小结
 
 > - 行为参数化，就是一个方法接受多个不同的行为作为参数，并在内部使用它们，完成不同行为的能力。
 > - 行为参数化可让代码更好地适应不断变化的要求，减轻未来的工作量。
@@ -371,7 +371,7 @@ int resultToh = h.apply(1); // 4 == 1->f->2->g->4
 int resultToi = i.apply(1); // 3 == 1->g->2->f->3
 ```
 
-### 小结
+#### 小结
 
 > - Lambda 表达式可以理解为一种匿名函数：他没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出异常的列表。
 > - Lambda 表达式可以简洁的传递代码。
@@ -389,7 +389,223 @@ int resultToi = i.apply(1); // 3 == 1->g->2->f->3
 
 ### 4. 引入流
 
+#### 小结
+
+> - 流是 “从支持数据处理操作的源生成的一系列元素”。
+> - 流利用内部迭代：迭代通过`filter`、`map`、`sorted`等操作被抽象掉了。
+> - 流操作有两类：中间操作和终端操作。
+> - filter 和 map 等中间操作会返回一个流，并可以链接在一起。可以用它们来设置一条流水线，但并不会生成任何结果。
+> - forEach 和 count 等终端操作会返回一个非流的值，并处理流水线以返回结果。
+> - 流中的元素是按需计算的。
+
 ### 5. 使用流
+
+##### 筛选和切片
+
+`filter(Lambda)` 根据Lambda筛选出相应的数据
+
+``` java
+List<Integer> numbers = Arrays.asList(1, 2, 3, 1, 3, 3, 2, 4);
+numbers.stream()
+  	   .filter(i -> i % 2 == 0)
+  	   .forEach(System.out::println);
+// 筛选出数组的偶数
+// filter(i -> i % 2 == 0)
+// 2 2 4
+```
+
+`distinct()` 过滤重复
+
+``` java
+List<Integer> numbers = Arrays.asList(1, 2, 3, 1, 3, 3, 2, 4);
+numbers.stream()
+  	   .filter(i -> i % 2 == 0)
+  	   .distinct()
+  	   .forEach(System.out::println);
+// 筛选出数组的偶数,去除重复
+// filter(i -> i % 2 == 0).distinct()
+// 2 4
+```
+
+`limit(int n)` 获取前 n 个数据
+
+``` java
+List<Integer> numbers = Arrays.asList(1, 2, 3, 1, 3, 3, 2, 4);
+numbers.stream()
+  	   .limit(3)
+  	   .forEach(System.out::println);
+// 打印出前3个数
+// limit(3)
+// 1 2 3
+```
+
+`skip(int n)` 去除前 n 个数据，**limit 和 skip 是互补的**
+
+``` java
+List<Integer> numbers = Arrays.asList(1, 2, 3, 1, 3, 3, 2, 4);
+numbers.stream()
+  	   .skip(5)
+  	   .forEach(System.out::println);
+// 打印出后3个数
+// skip(5)
+// 3 2 4
+```
+
+##### 映射
+
+`map(Lambda)` 接受一个函数作为参数。这个函数会被应用到每个元素上，并将其映射成一个新的元素（**映射**一词，是因为它和**转换**相似，但其中的差别在于它是“**创建一个新版本**”而不是去“**修改**”）。
+
+``` java
+String[] words = {"Hello", "World"};
+Arrays.stream(words)
+      .map(String::length)
+      .forEach(System.out::println);
+// 输出每个单词的长度
+// map(String::length)
+// 5 5
+```
+
+`flatMap(Lambda)` 和map作用相似，不过，他是把一个流中的每个值都换成**各自的流**，然后把所有的流**合并**成一个流。
+
+如下面这个例子，将单词表中所有**不同的字母**打印出来，用map就实现不了：
+
+``` java
+String[] words = {"Hello", "World"};
+Arrays.stream(words)
+      .map(s -> s.split("")) // 将每个单词转换成其字母构成的数组：{['H', "e", "l", "l", "o"], [ "W", "o", "r", "l", "d"]}
+  	  .flatMap(Arrays::stream) // 将各个流合并为一个流：{'H', "e", "l", "l", "o", "W", "o", "r", "l", "d"}
+  	  .distinct() // 去除重复
+      .forEach(System.out::println);
+// H e l o W r d
+```
+
+##### 查找和匹配
+
+`anyMatch` 流中是否有**一个元素**能匹配给定的谓词
+
+``` java
+Boolean[] arrays = {true, true, false};
+if(Arrays.stream(arrays).anyMatch(Boolean::booleanValue)) {
+  System.out.println("有一个以上匹配");
+} else {
+  System.out.println("没有一个匹配");
+}
+// 有一个以上匹配
+```
+
+`allMathc` 流中**所有元素**是否都能匹配给定的谓词
+
+``` java
+Boolean[] arrays = {true, true, false};
+if(Arrays.stream(arrays).allMatch(Boolean::booleanValue)) {
+  System.out.println("全部都能匹配");
+} else {
+  System.out.println("有一个以上不匹配");
+}
+// 有一个以上不匹配
+```
+
+`noneMatch` 流中**不能有任何元素**能匹配给定的谓词
+
+``` java
+Boolean[] arrays = {false, false, false};
+if(Arrays.stream(arrays).noneMatch(Boolean::booleanValue)) {
+  System.out.println("没有一个匹配");
+} else {
+  System.out.println("有一个以上匹配");
+}
+// 没有一个匹配
+```
+
+`findFirst` 查找流中的**第一个元素**
+
+``` java
+int[] arrays = {1, 2, 3, 4, 5};
+System.out.println(Arrays.stream(arrays).findFirst().getAsInt());
+// 1
+```
+
+`findAny` 返回**任意元素（一个）** ，一般配个filter使用
+
+``` java
+ int[] arrays = {1, 2, 3, 4, 5, 6};
+System.out.println(Arrays.stream(arrays)
+                   .map(x -> x * x)
+                   .filter(x -> x % 3 == 0)
+                   .findAny()
+                   .getAsInt()
+                  );
+// 9
+```
+
+##### 归约
+
+`reduce(T, BinaryOPerator<T>)` 将流中所有的元素迭代合并成一个结果，接受两个参数，第一个初始值，第二个将两个元素结合起来产生新值的函数。
+
+``` java
+int[] arrays = {1, 2, 3, 4, 5, 6};
+System.out.println(Arrays.stream(arrays)
+                   .reduce(Integer::sum)
+                   .getAsInt());
+// reduce((a, b) -> a + b)
+// 求和 21
+
+int[] arrays = {1, 2, 3, 4, 5, 6};
+System.out.println(Arrays.stream(arrays)
+                   .reduce(Integer::max)
+                   .getAsInt());
+// reduce(Integer::max)
+// 最大值 6
+
+int[] arrays = {1, 2, 3, 4, 5, 6};
+System.out.println(Arrays.stream(arrays)
+                   .reduce(Integer::min)
+                   .getAsInt());
+// reduce(Integer::min)
+// 最小值 1
+```
+
+##### 常用流操作
+
+| 操作        | 类型         | 返回类型        | 使用的类型/函数式接口            | 函数描述符          |
+| --------- | ---------- | ----------- | ---------------------- | -------------- |
+| filter    | 中间         | Stream<T>   | Predicate<T>           | T -> boolean   |
+| distinct  | 中间（有状态-无界） | Stream<T>   |                        |                |
+| skip      | 中间（有状态-有界） | Stream<T>   | long                   |                |
+| limit     | 中间（有状态-有界） | Stream<T>   | long                   |                |
+| map       | 中间         | Stream<R>   | Function<T, R>         | T -> R         |
+| flatMap   | 中间         | Stream<R>   | Function<T, Stream<R>> | T -> Stream<R> |
+| sorted    | 中间（有状态-无界） | Stream<T>   | Comparator<T>          | (T, T) -> int  |
+| anyMatch  | 终端         | boolean     | Predicate<T>           | T -> boolean   |
+| noneMatch | 终端         | boolean     | Predicate<T>           | T -> boolean   |
+| allMatch  | 终端         | boolean     | Predicate<T>           | T -> boolean   |
+| findAny   | 终端         | Optional<T> |                        |                |
+| findFirst | 终端         | Optional<T> |                        |                |
+| forEach   | 终端         | void        | Consumer<T>            | T -> void      |
+| collect   | 终端         | R           | Collector<T, A, R>     |                |
+| reduce    | 终端（有状态-有界） | Optional<T> | BinaryOperator<T>      | (T, T) -> T    |
+| count     | 终端         | long        |                        |                |
+
+##### 数值流、构建流、无限流
+
+数值流：IntStream、DoubleStream、LongStream。例子见[PythagoreanTriple.java](src\main\java\chapter5\PythagoreanTriple.java) 勾股数。
+
+构建流：流不仅可以从集合创建，也可以从值、数组、文件、以及 iterate 与 generate 等特定方法创建。例子[BuildingStreams.java](src\main\java\chapter5\BuildingStreams.java) 从六种方式构建流。
+
+无限流：顾名思义是**无限**的，使用是必须用配合 **limit()** 截断；有Stream.iterate 和 Stream.generate 两种方法。
+
+#### 小结
+
+> - Stream API 可以表达复杂的数据处理查询。见表[常用流操作](#常用流操作)。
+> - 可以用filter、 distinct、skip和 limit 对流做筛选和切片。
+> - 可以用map和flatMap提取或转换流中的元素。
+> - 可以用 findFirst 和 findAny 方法查找流中的元素。可以用 allMatch、noneMatch、anyMatch方法让流匹配给定的谓词。
+> -  findFirst、findAny、allMatch、noneMatch、anyMatch 这些方法都利用了短路：**找到结果就停止计算；没有必要处理整个流**。
+> - 可以用 reduce方法将流中所有的元素迭代合并成一个结果，例如求和或查找最大/最小元素。
+> - filter 和 map 等操作是**无状态**的，它们并不储存任何状态。reduce 等操作要存储状态才能计算出一个值。sorted 和 distinct 等操作也要存储状态，因为它们需要把流中的所有元素缓存起来才能返回一个新的流。这种操作为**有状态操作**。
+> - 流有三种基本的原始类型特化：IntStream、DoubleStream、LongStream。它们的操作也有相应的特化。
+> - 流不仅可以从集合创建，也可以从值、数组、文件、以及 iterate 与 generate 等特定方法创建。
+> - 无限流是没有固定大小的流。
 
 ### 6. 用流收集数据
 
