@@ -341,7 +341,7 @@ Apple a1 = c1.get();
 
 结合前面的知识实践操作一下
 
-[苹果排序 Sorting.java](Java 8 In Action\src\main\java\chapter3\Sorting.java)
+[苹果排序 Sorting.java](src/main/ava/chapter3/Sorting.java)
 
 **复合 Lambda 表达式的有用方法**
 
@@ -588,9 +588,9 @@ System.out.println(Arrays.stream(arrays)
 
 ##### 数值流、构建流、无限流
 
-数值流：IntStream、DoubleStream、LongStream。例子见[PythagoreanTriple.java](src\main\java\chapter5\PythagoreanTriple.java) 勾股数。
+数值流：IntStream、DoubleStream、LongStream。例子见[PythagoreanTriple.java](src/main/java/chapter5/PythagoreanTriple.java) 勾股数。
 
-构建流：流不仅可以从集合创建，也可以从值、数组、文件、以及 iterate 与 generate 等特定方法创建。例子[BuildingStreams.java](src\main\java\chapter5\BuildingStreams.java) 从六种方式构建流。
+构建流：流不仅可以从集合创建，也可以从值、数组、文件、以及 iterate 与 generate 等特定方法创建。例子[BuildingStreams.java](src/main/java/chapter5/BuildingStreams.java) 从六种方式构建流。
 
 无限流：顾名思义是**无限**的，使用是必须用配合 **limit()** 截断；有Stream.iterate 和 Stream.generate 两种方法。
 
@@ -600,7 +600,7 @@ System.out.println(Arrays.stream(arrays)
 > - 可以用filter、 distinct、skip和 limit 对流做筛选和切片。
 > - 可以用map和flatMap提取或转换流中的元素。
 > - 可以用 findFirst 和 findAny 方法查找流中的元素。可以用 allMatch、noneMatch、anyMatch方法让流匹配给定的谓词。
-> -  findFirst、findAny、allMatch、noneMatch、anyMatch 这些方法都利用了短路：**找到结果就停止计算；没有必要处理整个流**。
+> - findFirst、findAny、allMatch、noneMatch、anyMatch 这些方法都利用了短路：**找到结果就停止计算；没有必要处理整个流**。
 > - 可以用 reduce方法将流中所有的元素迭代合并成一个结果，例如求和或查找最大/最小元素。
 > - filter 和 map 等操作是**无状态**的，它们并不储存任何状态。reduce 等操作要存储状态才能计算出一个值。sorted 和 distinct 等操作也要存储状态，因为它们需要把流中的所有元素缓存起来才能返回一个新的流。这种操作为**有状态操作**。
 > - 流有三种基本的原始类型特化：IntStream、DoubleStream、LongStream。它们的操作也有相应的特化。
